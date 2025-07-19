@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RustBuilds - Чертежи и гайды для баз в Rust</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* === DESIGN SYSTEM VARIABLES === */
+        :root {
+            /* Color Palette */
+            --color-primary-black: #0a0a0a;
+            --color-anthracite: #1a1a1a;
+            --color-graphite: #2a2a2a;
+            --color-dark-gray: #3a3a3a;
+            
+            --color-accent-blue: #2563eb;
+            --color-steel-gray: #64748b;
+            --color-red-light: #ef4444;
+            --color-white: #ffffff;
+            --color-white-muted: #f8fafc;
+            --color-text-secondary: #94a3b8;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-weight-light: 300;
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --font-weight-heavy: 800;
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --spacing-2xl: 4rem;
+            --spacing-3xl: 6rem;
+            
+            /* Borders & Radius */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-width: 1px;
+            
+            /* Transitions */
+            --transition-fast: 0.2s ease;
+            --transition-medium: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+
+        /* === RESET & BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--color-primary-black) 0%, var(--color-anthracite) 100%);
+            color: var(--color-white);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* === CONTAINER SYSTEM === */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        /* === TYPOGRAPHY SYSTEM === */
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: var(--font-weight-heavy);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        h2 {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: var(--font-weight-bold);
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+        }
+
+        h3 {
+            font-size: clamp(1.25rem, 2vw, 1.5rem);
+            font-weight: var(--font-weight-semibold);
+            line-height: 1.3;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        p {
+            font-size: 1rem;
+            font-weight: var(--font-weight-regular);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* === HEADER === */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: var(--border-width) solid var(--color-graphite);
+            transition: var(--transition-medium);
+        }
+
+        .site-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: var(--font-weight-heavy);
+            color: var(--color-accent-blue);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-accent-blue), var(--color-red-light));
+            transform: scaleX(0);
+            transition: var(--transition-fast);
+        }
+
+        .logo:hover::after {
+            transform: scaleX(1);
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+        }
+
+        .main-nav a {
+            color: var(--color-white);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            position: relative;
+            transition: var(--transition-fast);
+        }
+
+        .main-nav a::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -8px;
+            width: 0;
+            height: 1px;
+            background: var(--color-accent-blue);
+            transition: var(--transition-fast);
+            transform: translateY(-50%);
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: var(--color-accent-blue);
+        }
+
+        .main-nav a:hover::before,
+        .main-nav a.active::before {
+            width: 4px;
+        }
+
+        /* === HERO SECTION === */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--color-primary-black) 0%, var(--color-anthracite) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, transparent 0%, rgba(42, 42, 42, 0.1) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(42, 42, 42, 0.1) 50%, transparent 100%);
+            background-size: 100px 100px;
+            animation: gridMove 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero h1 {
+            background: linear-gradient(135deg, var(--color-white) 0%, var(--color-accent-blue) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 600px;
+            margin: 0 auto var(--spacing-xl);
+            color: var(--color-text-secondary);
+        }
+
+        /* === BUTTON SYSTEM === */
+        .cta-button,
+        .button {
+            display: inline-block;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-red-light) 100%);
+            color: var(--color-white);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .cta-button::before,
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-medium);
+        }
+
+        .cta-button:hover,
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .cta-button:hover::before,
+        .button:hover::before {
+            left: 100%;
+        }
+
+        /* === SECTIONS === */
+        section {
+            padding: var(--spacing-3xl) 0;
+            position: relative;
+        }
+
+        .featured-products {
+            background: linear-gradient(180deg, transparent 0%, rgba(26, 26, 26, 0.5) 100%);
+        }
+
+        /* === PRODUCT GRID === */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+
+        .product-card {
+            background: var(--color-anthracite);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            border: var(--border-width) solid var(--color-graphite);
+            transition: var(--transition-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-accent-blue), var(--color-red-light));
+            transform: scaleX(0);
+            transition: var(--transition-medium);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-accent-blue);
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            background: var(--color-graphite);
+        }
+
+        .product-card h3 {
+            color: var(--color-white);
+        }
+
+        .price {
+            color: var(--color-accent-blue) !important;
+            font-weight: var(--font-weight-bold);
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-sm) !important;
+        }
+
+        /* === ADVANTAGES SECTION === */
+        .advantages {
+            background: var(--color-anthracite);
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+
+        .advantage-item {
+            text-align: center;
+            padding: var(--spacing-lg);
+            background: var(--color-graphite);
+            border-radius: var(--border-radius-lg);
+            border: var(--border-width) solid transparent;
+            transition: var(--transition-medium);
+            position: relative;
+        }
+
+        .advantage-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--border-radius-lg);
+            padding: var(--border-width);
+            background: linear-gradient(135deg, var(--color-accent-blue), var(--color-red-light));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: exclude;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: var(--transition-medium);
+        }
+
+        .advantage-item:hover::before {
+            opacity: 1;
+        }
+
+        .advantage-item h3 {
+            color: var(--color-white);
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* === FOOTER === */
+        .site-footer {
+            background: var(--color-primary-black);
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            border-top: var(--border-width) solid var(--color-graphite);
+        }
+
+        .site-footer p {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .main-nav ul {
+                gap: var(--spacing-md);
+            }
+            
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .advantages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero {
+                min-height: 80vh;
+            }
+        }
+
+        /* === UTILITY CLASSES === */
+        .text-center { text-align: center; }
+        .text-accent { color: var(--color-accent-blue); }
+        .text-white { color: var(--color-white); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="container">
+            <a href="#" class="logo">RustBuilds</a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active">Главная</a></li>
+                    <li><a href="#">Каталог</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Лучшие проекты баз для выживания в Rust</h1>
+                <p>Экономь время, доминируй на сервере с проверенными чертежами и подробными видео-гайдами.</p>
+                <a href="#" class="cta-button">Перейти в каталог</a>
+            </div>
+        </section>
+
+        <section class="featured-products">
+            <div class="container">
+                <h2 class="text-center">Популярные проекты</h2>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/400x200/2a2a2a/64748b?text=База+Неприступная" alt="Превью базы для соло игрока">
+                        <h3>База "Неприступная" для соло</h3>
+                        <p class="price">250 руб.</p>
+                        <p>Идеальный баланс стоимости и защиты. Множество ловушек и нестандартных решений.</p>
+                        <a href="#" class="button">Подробнее</a>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/400x200/2a2a2a/64748b?text=Клан-база+Цитадель" alt="Превью базы для клана">
+                        <h3>Клан-база "Цитадель"</h3>
+                        <p class="price">700 руб.</p>
+                        <p>Огромная база для клана из 5+ человек с внешними стенами и защитой от ракет.</p>
+                        <a href="#" class="button">Подробнее</a>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://via.placeholder.com/400x200/2a2a2a/64748b?text=Ферма-бункер" alt="Превью фермы">
+                        <h3>Компактная ферма-бункер</h3>
+                        <p class="price">150 руб.</p>
+                        <p>Максимально защищенная фермерская база со скрытым бункером для основного лута.</p>
+                        <a href="#" class="button">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="advantages">
+            <div class="container">
+                <h2 class="text-center">Почему выбирают нас?</h2>
+                <div class="advantages-grid">
+                    <div class="advantage-item">
+                        <h3>🚀 Мгновенная доставка</h3>
+                        <p>Ссылка на гайд и чертеж придет на ваш email сразу после оплаты.</p>
+                    </div>
+                    <div class="advantage-item">
+                        <h3>🎬 Подробные видео-гайды</h3>
+                        <p>Пошаговое строительство от фундамента до последней турели.</p>
+                    </div>
+                    <div class="advantage-item">
+                        <h3>🛡️ Проверено в бою</h3>
+                        <p>Все проекты протестированы на реальных серверах и оптимизированы для выживания.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 RustBuilds. Все права защищены.</p>
+            <p>Этот сайт не является официальным сайтом игры Rust и никак не связан с Facepunch Studios.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
