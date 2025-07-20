@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // --- Элементы DOM ---
+    // (без изменений, ваш подход к кэшированию элементов отличный)
     const regionBtn = document.getElementById('regionBtn');
     const currencyBtn = document.getElementById('currencyBtn');
     const regionDropdown = document.getElementById('regionDropdown');
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxClose = document.getElementById('lightboxClose');
     const newsletterForm = document.getElementById('newsletterForm');
+    const productGrid = document.querySelector('.product-grid'); // УЛУЧШЕНО: Родительский контейнер для товаров
 
     // --- Вспомогательные функции ---
 
@@ -50,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Обновляет все цены на странице.
-     * УЛУЧШЕНО: Использует data-атрибуты для всех цен, включая старые.
      */
     function updateAllPrices() {
         document.querySelectorAll('[data-price]').forEach(el => {
@@ -61,18 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Обновляет счетчик товаров в корзине и ARIA-атрибут.
-     * УЛУЧШЕНО: Объединяет обновление UI и доступности.
      */
     function updateCartUI() {
         const itemCount = state.cartItems.length;
         cartCountEl.textContent = itemCount;
         cartIcon.setAttribute('aria-label', `Shopping cart with ${itemCount} items`);
-
-        if (itemCount > 0) {
-            cartCountEl.classList.add('show');
-        } else {
-            cartCountEl.classList.remove('show');
-        }
+        cartCountEl.classList.toggle('show', itemCount > 0); // УЛУЧШЕНО: Используем toggle с условием
     }
     
     /**
@@ -96,34 +91,48 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {HTMLElement} dropdown - Элемент выпадающего списка.
      */
     function toggleDropdown(dropdown) {
-        const allDropdowns = document.querySelectorAll('.selector-dropdown');
-        const isOpen = dropdown.classList.contains('show');
+        // УЛУЧШЕНО: Более простой способ переключения
+        // Сначала закрываем все выпадающие списки, кроме текущего
+        document.querySelectorAll('.selector-dropdown.show').forEach(dd => {
+            if (dd !== dropdown) {
+                dd.classList.remove('show');
+            }
+        });
+        // Затем переключаем класс для текущего списка
+        dropdown.classList.toggle('show');
+    }
 
-        // Сначала закрываем все списки
-        allDropdowns.forEach(dd => dd.classList.remove('show'));
-
-        // Открываем нужный, если он был закрыт
-        if (!isOpen) {
-            dropdown.classList.add('show');
-        }
+    /**
+     * ИСПРАВЛЕНО: Безопасное обновление текста кнопки региона.
+     * @param {string} region - Код региона (например, 'US').
+     */
+    function updateRegionButton(region) {
+        // Очищаем кнопку
+        regionBtn.innerHTML = '';
+        // Создаем иконку
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-globe';
+        // Создаем текстовый узел
+        const text = document.createTextNode(` ${region}`);
+        // Добавляем их в кнопку
+        regionBtn.appendChild(icon);
+        regionBtn.appendChild(text);
     }
 
     // --- Инициализация и загрузка данных ---
 
     function initializeApp() {
-        // Скрытие прелоадера
-        setTimeout(() => {
-            if (preloader) preloader.classList.add('hidden');
-        }, 500); // Небольшая задержка для плавности
+        if (preloader) {
+            setTimeout(() => preloader.classList.add('hidden'), 500);
+        }
 
-        // Загрузка сохраненных настроек и корзины
         const savedRegion = localStorage.getItem('selectedRegion');
         const savedCurrency = localStorage.getItem('selectedCurrency');
         const savedCart = localStorage.getItem('cartItems');
 
         if (savedRegion) {
             state.currentRegion = savedRegion;
-            regionBtn.innerHTML = `<i class="fas fa-globe"></i> ${savedRegion}`;
+            updateRegionButton(savedRegion); // ИСПРАВЛЕНО: Безопасное обновление
         }
 
         if (savedCurrency) {
@@ -132,20 +141,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (savedCart) {
-            state.cartItems = JSON.parse(savedCart);
+            try {
+                // ИСПРАВЛЕНО: Безопасный парсинг JSON из localStorage
+                state.cartItems = JSON.parse(savedCart) || [];
+            } catch (error) {
+                console.error("Error parsing cart items from localStorage:", error);
+                state.cartItems = []; // В случае ошибки сбрасываем корзину
+            }
         }
         
-        // Первоначальное обновление UI
         updateAllPrices();
         updateCartUI();
-
-        // Инициализация анимаций при прокрутке
         setupScrollAnimations();
     }
     
     // --- Слушатели событий ---
 
-    // Переключение выпадающих списков
+    // Переключение выпадающих списков (без изменений)
     regionBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleDropdown(regionDropdown);
@@ -156,22 +168,18 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleDropdown(currencyDropdown);
     });
 
-    // Выбор региона
-    regionDropdown.addEventListener('click', (e) => {
+    // УЛУЧШЕНО: Универсальный обработчик для выбора опции в выпадающем списке
+    function handleDropdownSelection(e, type) {
         const target = e.target.closest('.dropdown-item');
-        if (target) {
+        if (!target) return;
+
+        if (type === 'region') {
             const region = target.getAttribute('data-region');
             state.currentRegion = region;
-            regionBtn.innerHTML = `<i class="fas fa-globe"></i> ${region}`;
+            updateRegionButton(region); // ИСПРАВЛЕНО: Безопасное обновление
             localStorage.setItem('selectedRegion', region);
             regionDropdown.classList.remove('show');
-        }
-    });
-
-    // Выбор валюты
-    currencyDropdown.addEventListener('click', (e) => {
-        const target = e.target.closest('.dropdown-item');
-        if (target) {
+        } else if (type === 'currency') {
             const currency = target.getAttribute('data-currency');
             state.currentCurrency = currency;
             currencyBtn.textContent = currency;
@@ -179,37 +187,47 @@ document.addEventListener('DOMContentLoaded', function() {
             updateAllPrices();
             currencyDropdown.classList.remove('show');
         }
-    });
+    }
 
-    // Закрытие выпадающих списков при клике вне их
+    regionDropdown.addEventListener('click', (e) => handleDropdownSelection(e, 'region'));
+    currencyDropdown.addEventListener('click', (e) => handleDropdownSelection(e, 'currency'));
+
     document.addEventListener('click', () => {
         document.querySelectorAll('.selector-dropdown.show').forEach(dd => dd.classList.remove('show'));
     });
 
-    // Эффект "прилипания" хедера при прокрутке
-    // ИСПРАВЛЕНО: Один слушатель события scroll
     window.addEventListener('scroll', () => {
         header.classList.toggle('scrolled', window.scrollY > 50);
     });
 
-    // Добавление в корзину
-    document.querySelectorAll('.add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            const productName = this.getAttribute('data-product-name');
-            const price = this.getAttribute('data-price');
-            
-            state.cartItems.push({
-                name: productName,
-                price: parseFloat(price),
-            });
-            
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
-            updateCartUI();
-            showCartNotification(productName);
-        });
-    });
+    // УЛУЧШЕНО: Делегирование событий для добавления в корзину и открытия Lightbox
+    if (productGrid) {
+        productGrid.addEventListener('click', function(e) {
+            // 1. Добавление в корзину
+            const addToCartBtn = e.target.closest('.add-to-cart');
+            if (addToCartBtn) {
+                const productName = addToCartBtn.getAttribute('data-product-name');
+                const price = addToCartBtn.getAttribute('data-price');
+                
+                state.cartItems.push({ name: productName, price: parseFloat(price) });
+                
+                localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+                updateCartUI();
+                showCartNotification(productName);
+                return; // Выходим, чтобы не сработал код для lightbox
+            }
 
-    // Форма подписки
+            // 2. Открытие Lightbox
+            const productImage = e.target.closest('.product-image img');
+            if (productImage) {
+                lightboxImg.src = productImage.src;
+                lightboxImg.alt = productImage.alt;
+                lightbox.classList.add('show');
+            }
+        });
+    }
+
+    // Форма подписки (без изменений)
     newsletterForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const emailInput = this.querySelector('input[type="email"]');
@@ -217,86 +235,52 @@ document.addEventListener('DOMContentLoaded', function() {
         this.reset();
     });
 
-    // Плавный скролл по якорям
+    // Плавный скролл по якорям (без изменений)
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // ИСПРАВЛЕНО: Проверка, что селектор валидный и не просто "#"
+            if (targetId.length > 1) {
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             }
         });
     });
 
-    // Lightbox (всплывающее изображение)
-    document.querySelectorAll('.product-image img').forEach(img => {
-        img.addEventListener('click', function() {
-            lightboxImg.src = this.src;
-            lightboxImg.alt = this.alt;
-            lightbox.classList.add('show');
-        });
-    });
-
+    // Lightbox Close (без изменений)
     function closeLightbox() {
         lightbox.classList.remove('show');
     }
-
     lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === this) {
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
             closeLightbox();
         }
     });
     
     // --- Анимации ---
     
-    // ИСПРАВЛЕНО: Для ховер-эффектов используются классы CSS
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('mouseenter', () => card.classList.add('hover-effect'));
-        card.addEventListener('mouseleave', () => card.classList.remove('hover-effect'));
-    });
-    /*
-      В твоем CSS нужно добавить:
-      .product-card.hover-effect {
-          transform: translateY(-8px) scale(1.02);
-      }
-    */
-    
-    // ИСПРАВЛЕНО: Одна система анимации при прокрутке
+    // Анимации при прокрутке (ваш код отличный, без изменений)
     function setupScrollAnimations() {
         const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
-        
         if (!('IntersectionObserver' in window)) {
-            // Если браузер не поддерживает IntersectionObserver, просто показываем элементы
             elementsToAnimate.forEach(el => el.classList.add('is-visible'));
             return;
         }
-
-        const observer = new IntersectionObserver((entries) => {
+        const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target); // Отключаем наблюдение после анимации
+                    obs.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.1 });
-
         elementsToAnimate.forEach(el => observer.observe(el));
     }
-    /*
-      В HTML добавь класс .animate-on-scroll к нужным элементам.
-      В CSS добавь:
-      .animate-on-scroll {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
-      }
-      .animate-on-scroll.is-visible {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    */
+
 
     // --- Запуск приложения ---
     initializeApp();

@@ -190,8 +190,9 @@ body {
 .site-header.scrolled .main-nav a,
 .site-header.scrolled .header-icon,
 .site-header.scrolled .selector-btn {
-    color: var(--color-text-inverse); /* Используем переменную для темного текста */
+    color: var(--color-text-inverse);
 }
+
 .site-header.scrolled .main-nav a:hover,
 .site-header.scrolled .main-nav a.active,
 .site-header.scrolled .header-icon:hover {
@@ -199,9 +200,10 @@ body {
 }
 
 .site-header.scrolled .selector-btn {
-    background: var(--color-bg-secondary); /* Немного изменим фон кнопки */
+    background: var(--color-bg-secondary);
     border-color: var(--color-border-secondary);
 }
+
 .container {
     max-width: 1400px;
     margin: 0 auto;
