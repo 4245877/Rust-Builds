@@ -180,10 +180,28 @@ body {
 }
 
 .site-header.scrolled {
-    background: rgba(10, 10, 10, 0.95);
+    background: rgba(255, 255, 255, 0.9);
     box-shadow: var(--shadow-lg);
+    border-bottom: 1px solid var(--color-border-secondary);
 }
 
+/* Меняем цвет текста для логотипа и ссылок при прокрутке */
+.site-header.scrolled .logo,
+.site-header.scrolled .main-nav a,
+.site-header.scrolled .header-icon,
+.site-header.scrolled .selector-btn {
+    color: var(--color-text-inverse); /* Используем переменную для темного текста */
+}
+.site-header.scrolled .main-nav a:hover,
+.site-header.scrolled .main-nav a.active,
+.site-header.scrolled .header-icon:hover {
+    color: var(--color-primary);
+}
+
+.site-header.scrolled .selector-btn {
+    background: var(--color-bg-secondary); /* Немного изменим фон кнопки */
+    border-color: var(--color-border-secondary);
+}
 .container {
     max-width: 1400px;
     margin: 0 auto;
@@ -1546,6 +1564,6 @@ body {
     a:after {
         content: " (" attr(href) ")";
         font-size: 0.8rem;
-        color: #666;
+        color: #665;
     }
 }

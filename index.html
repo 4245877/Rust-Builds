@@ -3,9 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RustBuilds - Premium Base Blueprints for Rust</title>
+    <title>RustBuilds - Премиум чертежи баз для Rust | Лучшие защищенные базы</title>
+    <meta name="description" content="Премиум чертежи баз для игры Rust с детальными видеогидами. Боевые проверенные дизайны для соло игроков и кланов. Быстрая доставка за 5 минут.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
+    <script async
+  src="https://pay.google.com/gp/p/js/pay.js"
+  onload="onGooglePayLoaded()"></script>
+    
+    <!-- JSON-LD структурированные данные -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "RustBuilds",
+      "url": "https://rustbuilds.com",
+      "logo": "https://rustbuilds.com/logo.png",
+      "description": "Премиум чертежи баз и гиды для игры Rust",
+      "email": "support@rustbuilds.com",
+      "telephone": "+1-555-123-4567",
+      "sameAs": [],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "US"
+      },
+      "offers": [
+        {
+          "@type": "Product",
+          "name": "The Impenetrable Solo Fortress",
+          "description": "Идеальный баланс стоимости и защиты для соло игроков",
+          "price": "8.99",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Product", 
+          "name": "Clan Citadel Megabase",
+          "description": "Массивный комплекс для кланов 5+ игроков",
+          "price": "12.99",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Product",
+          "name": "Stealth Farm Bunker", 
+          "description": "Максимально защищенная фарм база с скрытой бункерной системой",
+          "price": "6.99",
+          "priceCurrency": "USD"
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
     <!-- Skip to content -->
@@ -22,32 +68,32 @@
             <div class="header-content">
                 <a href="#" class="logo">RustBuilds</a>
                 
-                <nav class="main-nav">
+                <nav class="main-nav" role="navigation" aria-label="Основная навигация">
                     <ul>
-                        <li><a href="#" class="active">Home</a></li>
-                        <li><a href="#catalog">Catalog</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#" class="active">Главная</a></li>
+                        <li><a href="#catalog">Каталог</a></li>
+                        <li><a href="#contact">Контакты</a></li>
                         <li>
                             <div class="region-selector">
-                                <button class="selector-btn" id="regionBtn">
-                                    <i class="fas fa-globe"></i> US
+                                <button class="selector-btn" id="regionBtn" aria-label="Выбор региона" aria-expanded="false" aria-haspopup="listbox">
+                                    <i class="fas fa-globe" aria-hidden="true"></i> US
                                 </button>
-                                <div class="selector-dropdown" id="regionDropdown">
-                                    <div class="dropdown-item" data-region="US">United States</div>
-                                    <div class="dropdown-item" data-region="EU">Europe</div>
-                                    <div class="dropdown-item" data-region="UK">United Kingdom</div>
-                                    <div class="dropdown-item" data-region="CA">Canada</div>
+                                <div class="selector-dropdown" id="regionDropdown" role="listbox" aria-label="Список регионов">
+                                    <div class="dropdown-item" data-region="US" role="option">United States</div>
+                                    <div class="dropdown-item" data-region="EU" role="option">Europe</div>
+                                    <div class="dropdown-item" data-region="UK" role="option">United Kingdom</div>
+                                    <div class="dropdown-item" data-region="CA" role="option">Canada</div>
                                 </div>
                             </div>
                         </li>
                         <li>
                             <div class="currency-selector">
-                                <button class="selector-btn" id="currencyBtn">USD</button>
-                                <div class="selector-dropdown" id="currencyDropdown">
-                                    <div class="dropdown-item" data-currency="USD">USD ($)</div>
-                                    <div class="dropdown-item" data-currency="EUR">EUR (€)</div>
-                                    <div class="dropdown-item" data-currency="GBP">GBP (£)</div>
-                                    <div class="dropdown-item" data-currency="CAD">CAD ($)</div>
+                                <button class="selector-btn" id="currencyBtn" aria-label="Выбор валюты" aria-expanded="false" aria-haspopup="listbox">USD</button>
+                                <div class="selector-dropdown" id="currencyDropdown" role="listbox" aria-label="Список валют">
+                                    <div class="dropdown-item" data-currency="USD" role="option">USD ($)</div>
+                                    <div class="dropdown-item" data-currency="EUR" role="option">EUR (€)</div>
+                                    <div class="dropdown-item" data-currency="GBP" role="option">GBP (£)</div>
+                                    <div class="dropdown-item" data-currency="CAD" role="option">CAD ($)</div>
                                 </div>
                             </div>
                         </li>
@@ -55,11 +101,11 @@
                 </nav>
 
                 <div class="header-actions">
-                    <a href="#account" class="header-icon">
-                        <i class="fas fa-user"></i>
+                    <a href="#account" class="header-icon" aria-label="Личный кабинет">
+                        <i class="fas fa-user" aria-hidden="true"></i>
                     </a>
-                    <a href="#cart" class="header-icon" id="cartIcon">
-                        <i class="fas fa-shopping-cart"></i>
+                    <a href="#cart" class="header-icon" id="cartIcon" aria-label="Корзина покупок">
+                        <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                         <span class="cart-count" id="cartCount">0</span>
                     </a>
                 </div>
@@ -72,13 +118,13 @@
         <section class="hero">
             <div class="container">
                 <div class="hero-content">
-                    <h1>Premium Base Blueprints for Rust</h1>
+                    <h1>Премиум чертежи баз для Rust</h1>
                     <div class="hero-rating">
-                        <span class="stars">★★★★★</span>
-                        <span>(2,847 reviews)</span>
+                        <span class="stars" aria-label="5 звезд из 5">★★★★★</span>
+                        <span>(2,847 отзывов)</span>
                     </div>
-                    <p>Dominate servers with battle-tested blueprints and detailed video guides. Save time, build better.</p>
-                    <a href="#catalog" class="cta-button">Shop Now</a>
+                    <p>Доминируйте на серверах с боевыми проверенными чертежами и детальными видеогидами. Экономьте время, стройте лучше.</p>
+                    <a href="#catalog" class="cta-button">Купить сейчас</a>
                 </div>
             </div>
         </section>
@@ -86,52 +132,52 @@
         <!-- Featured Products -->
         <section class="featured-products" id="catalog">
             <div class="container">
-                <h2 class="section-title">Bestsellers</h2>
+                <h2 class="section-title">Бестселлеры</h2>
                 <div class="product-grid">
-                    <div class="product-card" data-product="solo-fortress">
+                    <article class="product-card" data-product="solo-fortress" data-product-id="1" data-category="solo">
                         <div class="product-image">
-                            <span class="product-badge">Bestseller</span>
-                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Solo Fortress Base</text></svg>" alt="Solo Fortress Base Preview">
+                            <span class="product-badge">Бестселлер</span>
+                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Solo Fortress Base</text></svg>" alt="Предварительный просмотр базы Solo Fortress - компактная защищенная база для одиночных игроков">
                         </div>
                         <div class="product-content">
-                            <h3 class="product-title">The Impenetrable Solo Fortress</h3>
+                            <h3 class="product-title">Неприступная соло крепость</h3>
                             <div class="product-price">
                                 <span class="current-price">$8.99</span>
                                 <span class="old-price">$12.99</span>
                             </div>
-                            <p class="product-description">Perfect balance of cost and protection. Multiple trap systems and innovative design solutions for solo players.</p>
-                            <button class="product-button add-to-cart" data-product-name="The Impenetrable Solo Fortress" data-price="8.99">Add to Cart</button>
+                            <p class="product-description">Идеальный баланс стоимости и защиты. Множественные системы ловушек и инновационные дизайнерские решения для соло игроков.</p>
+                            <button class="product-button add-to-cart" data-product-name="The Impenetrable Solo Fortress" data-price="8.99" data-product-id="1">Добавить в корзину</button>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="product-card" data-product="clan-citadel">
+                    <article class="product-card" data-product="clan-citadel" data-product-id="2" data-category="clan">
                         <div class="product-image">
-                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Clan Citadel Base</text></svg>" alt="Clan Citadel Base Preview">
+                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Clan Citadel Base</text></svg>" alt="Предварительный просмотр базы Clan Citadel - крупная база для кланов с внешними стенами">
                         </div>
                         <div class="product-content">
-                            <h3 class="product-title">Clan Citadel Megabase</h3>
+                            <h3 class="product-title">Клановая цитадель мегабаза</h3>
                             <div class="product-price">
                                 <span class="current-price">$12.99</span>
                                 <span class="old-price">$16.99</span>
                             </div>
-                            <p class="product-description">Massive compound for 5+ player clans with external walls and rocket-resistant design.</p>
-                            <button class="product-button add-to-cart" data-product-name="Clan Citadel Megabase" data-price="12.99">Add to Cart</button>
+                            <p class="product-description">Массивный комплекс для кланов 5+ игроков с внешними стенами и ракетоустойчивым дизайном.</p>
+                            <button class="product-button add-to-cart" data-product-name="Clan Citadel Megabase" data-price="12.99" data-product-id="2">Добавить в корзину</button>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="product-card" data-product="farm-bunker">
+                    <article class="product-card" data-product="farm-bunker" data-product-id="3" data-category="farm">
                         <div class="product-image">
-                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Farm Bunker Base</text></svg>" alt="Farm Bunker Base Preview">
+                            <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='250'><rect width='100%' height='100%' fill='%23f8f9fa'/><text x='50%' y='50%' text-anchor='middle' dy='.3em' font-family='Inter' font-size='18' fill='%23666'>Farm Bunker Base</text></svg>" alt="Предварительный просмотр фарм бункера - скрытая защищенная база для фарма">
                         </div>
                         <div class="product-content">
-                            <h3 class="product-title">Stealth Farm Bunker</h3>
+                            <h3 class="product-title">Скрытый фарм бункер</h3>
                             <div class="product-price">
                                 <span class="current-price">$6.99</span>
                             </div>
-                            <p class="product-description">Maximally protected farming base with hidden bunker system for main loot storage.</p>
-                            <button class="product-button add-to-cart" data-product-name="Stealth Farm Bunker" data-price="6.99">Add to Cart</button>
+                            <p class="product-description">Максимально защищенная фарм база с скрытой бункерной системой для хранения основного лута.</p>
+                            <button class="product-button add-to-cart" data-product-name="Stealth Farm Bunker" data-price="6.99" data-product-id="3">Добавить в корзину</button>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
@@ -139,106 +185,123 @@
         <!-- Advantages -->
         <section class="advantages">
             <div class="container">
-                <h2 class="section-title">Why Choose RustBuilds?</h2>
+                <h2 class="section-title">Почему выбирают RustBuilds?</h2>
                 <div class="advantages-grid">
-                    <div class="advantage-item">
-                        <h3>🚀 Fast Delivery in 5 Minutes</h3>
-                        <p>Instant access to blueprints and video guides delivered to your email immediately after purchase.</p>
-                    </div>
-                    <div class="advantage-item">
-                        <h3>🎬 Detailed Video Tutorials</h3>
-                        <p>Step-by-step construction guides from foundation to the final turret placement.</p>
-                    </div>
-                    <div class="advantage-item">
-                        <h3>🛡️ Battle-Tested Designs</h3>
-                        <p>All blueprints tested on live servers and optimized for maximum survivability and cost-efficiency.</p>
-                    </div>
+                    <article class="advantage-item">
+                        <h3>🚀 Быстрая доставка за 5 минут</h3>
+                        <p>Мгновенный доступ к чертежам и видеогидам, доставляемым на ваш email сразу после покупки.</p>
+                    </article>
+                    <article class="advantage-item">
+                        <h3>🎬 Детальные видео туториалы</h3>
+                        <p>Пошаговые гиды по строительству от фундамента до расстановки финальных турелей.</p>
+                    </article>
+                    <article class="advantage-item">
+                        <h3>🛡️ Боевые проверенные дизайны</h3>
+                        <p>Все чертежи протестированы на живых серверах и оптимизированы для максимальной выживаемости и экономичности.</p>
+                    </article>
                 </div>
             </div>
         </section>
 
         <!-- Newsletter -->
-        <section class="newsletter">
+        <section class="newsletter" id="newsletter">
             <div class="container">
-                <h2>Join the Club</h2>
-                <p>Get exclusive blueprints, early access to new designs, and building tips straight to your inbox.</p>
-                <form class="newsletter-form" id="newsletterForm">
-                    <input type="email" class="newsletter-input" placeholder="Enter your email" required>
-                    <button type="submit" class="newsletter-button">Subscribe</button>
+                <h2>Присоединяйтесь к клубу</h2>
+                <p>Получайте эксклюзивные чертежи, ранний доступ к новым дизайнам и советы по строительству прямо на вашу почту.</p>
+                <form class="newsletter-form" id="newsletterForm" action="/newsletter-subscribe" method="post">
+                    <label for="newsletter-email" class="sr-only">Email адрес для подписки</label>
+                    <input type="email" id="newsletter-email" name="email" class="newsletter-input" placeholder="Введите ваш email" required>
+                    <button type="submit" class="newsletter-button">Подписаться</button>
                 </form>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" id="contact">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
+                <section class="footer-section">
                     <h3>RustBuilds</h3>
-                    <p>Premium base blueprints and guides for Rust survival game. Build better, survive longer.</p>
-                    <div class="payment-icons">
+                    <p>Премиум чертежи баз и гиды для игры Rust на выживание. Стройте лучше, выживайте дольше.</p>
+                    <div class="payment-icons" role="img" aria-label="Принимаемые способы оплаты">
                         <div class="payment-icon">VISA</div>
                         <div class="payment-icon">MC</div>
                         <div class="payment-icon">AMEX</div>
                         <div class="payment-icon">PAY</div>
                     </div>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
+                </section>
+                <section class="footer-section">
+                    <h3>Быстрые ссылки</h3>
                     <ul>
-                        <li><a href="#catalog">Catalog</a></li>
-                        <li><a href="#bestsellers">Bestsellers</a></li>
-                        <li><a href="#new-releases">New Releases</a></li>
-                        <li><a href="#free-guides">Free Guides</a></li>
+                        <li><a href="#catalog">Каталог</a></li>
+                        <li><a href="#bestsellers">Бестселлеры</a></li>
+                        <li><a href="#new-releases">Новинки</a></li>
+                        <li><a href="#free-guides">Бесплатные гиды</a></li>
                     </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Support</h3>
+                </section>
+                <section class="footer-section">
+                    <h3>Поддержка</h3>
                     <ul>
-                        <li><a href="#contact">Contact Us</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                        <li><a href="#refund-policy">Refund Policy</a></li>
-                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#contact-form">Связаться с нами</a></li>
+                        <li><a href="#faq">Часто задаваемые вопросы</a></li>
+                        <li><a href="#refund-policy">Политика возврата</a></li>
+                        <li><a href="#terms">Условия обслуживания</a></li>
                     </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Legal</h3>
+                </section>
+                <section class="footer-section">
+                    <h3>Правовая информация</h3>
                     <ul>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                        <li><a href="#cookies">Cookie Preferences</a></li>
-                        <li><a href="#disclaimer">Disclaimer</a></li>
+                        <li><a href="#privacy">Политика конфиденциальности</a></li>
+                        <li><a href="#cookies">Настройки cookies</a></li>
+                        <li><a href="#disclaimer">Отказ от ответственности</a></li>
                     </ul>
-                    <p style="margin-top: 20px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">
-                        📧 support@rustbuilds.com<br>
-                        📞 +1 (555) 123-4567
-                    </p>
-                </div>
+                    <address style="margin-top: 20px; font-size: 0.9rem; color: rgba(255,255,255,0.6); font-style: normal;">
+                        📧 <a href="mailto:support@rustbuilds.com">support@rustbuilds.com</a><br>
+                        📞 <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                    </address>
+                </section>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 RustBuilds. All rights reserved.</p>
-                <p style="margin-top: 10px;">This site is not affiliated with Rust or Facepunch Studios. | Powered by Shopify</p>
+                <p>&copy; 2025 RustBuilds. Все права защищены.</p>
+                <p style="margin-top: 10px;">Этот сайт не связан с Rust или Facepunch Studios. | Powered by Shopify</p>
             </div>
         </div>
     </footer>
 
     <!-- Cart Notification -->
-    <div class="cart-notification" id="cartNotification">
+    <div class="cart-notification" id="cartNotification" role="alert" aria-live="polite">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <i class="fas fa-check-circle" style="color: var(--success-color); font-size: 1.5rem;"></i>
+            <i class="fas fa-check-circle" style="color: var(--success-color); font-size: 1.5rem;" aria-hidden="true"></i>
             <div>
-                <strong>Item added to cart!</strong>
+                <strong>Товар добавлен в корзину!</strong>
                 <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.9rem;" id="cartNotificationText"></p>
             </div>
         </div>
     </div>
 
     <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-        <span class="lightbox-close" id="lightboxClose">&times;</span>
-        <img id="lightboxImg" src="" alt="">
+    <div class="lightbox" id="lightbox" role="dialog" aria-labelledby="lightbox-title" aria-hidden="true">
+        <span class="lightbox-close" id="lightboxClose" aria-label="Закрыть модальное окно">&times;</span>
+        <img id="lightboxImg" src="" alt="" role="img">
+        <div id="lightbox-title" class="sr-only"></div>
     </div>
+
+    <!-- Screen reader only class for accessibility -->
+    <style>
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    </style>
 
 <script src="script.js"></script>
 </body>
