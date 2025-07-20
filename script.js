@@ -1,329 +1,303 @@
-  // Global state
-        let cartItems = [];
-        let currentRegion = 'US';
-        let currentCurrency = 'USD';
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Глобальное состояние и константы ---
+    const state = {
+        cartItems: [],
+        currentRegion: 'US',
+        currentCurrency: 'USD',
+    };
 
-        // Currency conversion rates (example rates)
-        const exchangeRates = {
-            USD: 1,
-            EUR: 0.85,
-            GBP: 0.73,
-            CAD: 1.35
-        };
+    const exchangeRates = {
+        USD: 1,
+        EUR: 0.85,
+        GBP: 0.73,
+        CAD: 1.35
+    };
+    
+    const currencySymbols = {
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        CAD: '$'
+    };
 
-        // Preloader
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                document.getElementById('preloader').classList.add('hidden');
-                
-                // Animate elements on load
-                const elementsToAnimate = document.querySelectorAll('.product-card, .advantage-item');
-                elementsToAnimate.forEach((el, index) => {
-                    setTimeout(() => {
-                        el.classList.add('fade-in-up');
-                    }, index * 100);
-                });
-            }, 1000);
+    // --- Элементы DOM ---
+    const regionBtn = document.getElementById('regionBtn');
+    const currencyBtn = document.getElementById('currencyBtn');
+    const regionDropdown = document.getElementById('regionDropdown');
+    const currencyDropdown = document.getElementById('currencyDropdown');
+    const preloader = document.getElementById('preloader');
+    const header = document.querySelector('.site-header');
+    const cartCountEl = document.getElementById('cartCount');
+    const cartIcon = document.getElementById('cartIcon');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const newsletterForm = document.getElementById('newsletterForm');
+
+    // --- Вспомогательные функции ---
+
+    /**
+     * Конвертирует цену и форматирует ее с символом валюты.
+     * @param {number} originalPrice - Исходная цена в USD.
+     * @returns {string} - Отформатированная строка с ценой.
+     */
+    function formatPrice(originalPrice) {
+        const rate = exchangeRates[state.currentCurrency] || 1;
+        const symbol = currencySymbols[state.currentCurrency] || '$';
+        const convertedPrice = (originalPrice * rate).toFixed(2);
+        return `${symbol}${convertedPrice}`;
+    }
+
+    /**
+     * Обновляет все цены на странице.
+     * УЛУЧШЕНО: Использует data-атрибуты для всех цен, включая старые.
+     */
+    function updateAllPrices() {
+        document.querySelectorAll('[data-price]').forEach(el => {
+            const originalPrice = parseFloat(el.getAttribute('data-price'));
+            el.textContent = formatPrice(originalPrice);
         });
+    }
 
-        // Region and Currency Selectors
-        document.getElementById('regionBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleDropdown('regionDropdown');
-        });
+    /**
+     * Обновляет счетчик товаров в корзине и ARIA-атрибут.
+     * УЛУЧШЕНО: Объединяет обновление UI и доступности.
+     */
+    function updateCartUI() {
+        const itemCount = state.cartItems.length;
+        cartCountEl.textContent = itemCount;
+        cartIcon.setAttribute('aria-label', `Shopping cart with ${itemCount} items`);
 
-        document.getElementById('currencyBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleDropdown('currencyDropdown');
-        });
+        if (itemCount > 0) {
+            cartCountEl.classList.add('show');
+        } else {
+            cartCountEl.classList.remove('show');
+        }
+    }
+    
+    /**
+     * Показывает уведомление о добавлении товара в корзину.
+     * @param {string} productName - Название добавленного товара.
+     */
+    function showCartNotification(productName) {
+        const notification = document.getElementById('cartNotification');
+        const notificationText = document.getElementById('cartNotificationText');
+        
+        notificationText.textContent = `${productName} has been added to your cart.`;
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+    
+    /**
+     * Переключает видимость выпадающих списков.
+     * @param {HTMLElement} dropdown - Элемент выпадающего списка.
+     */
+    function toggleDropdown(dropdown) {
+        const allDropdowns = document.querySelectorAll('.selector-dropdown');
+        const isOpen = dropdown.classList.contains('show');
 
-        function toggleDropdown(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            const isOpen = dropdown.classList.contains('show');
+        // Сначала закрываем все списки
+        allDropdowns.forEach(dd => dd.classList.remove('show'));
+
+        // Открываем нужный, если он был закрыт
+        if (!isOpen) {
+            dropdown.classList.add('show');
+        }
+    }
+
+    // --- Инициализация и загрузка данных ---
+
+    function initializeApp() {
+        // Скрытие прелоадера
+        setTimeout(() => {
+            if (preloader) preloader.classList.add('hidden');
+        }, 500); // Небольшая задержка для плавности
+
+        // Загрузка сохраненных настроек и корзины
+        const savedRegion = localStorage.getItem('selectedRegion');
+        const savedCurrency = localStorage.getItem('selectedCurrency');
+        const savedCart = localStorage.getItem('cartItems');
+
+        if (savedRegion) {
+            state.currentRegion = savedRegion;
+            regionBtn.innerHTML = `<i class="fas fa-globe"></i> ${savedRegion}`;
+        }
+
+        if (savedCurrency) {
+            state.currentCurrency = savedCurrency;
+            currencyBtn.textContent = savedCurrency;
+        }
+
+        if (savedCart) {
+            state.cartItems = JSON.parse(savedCart);
+        }
+        
+        // Первоначальное обновление UI
+        updateAllPrices();
+        updateCartUI();
+
+        // Инициализация анимаций при прокрутке
+        setupScrollAnimations();
+    }
+    
+    // --- Слушатели событий ---
+
+    // Переключение выпадающих списков
+    regionBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown(regionDropdown);
+    });
+
+    currencyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown(currencyDropdown);
+    });
+
+    // Выбор региона
+    regionDropdown.addEventListener('click', (e) => {
+        const target = e.target.closest('.dropdown-item');
+        if (target) {
+            const region = target.getAttribute('data-region');
+            state.currentRegion = region;
+            regionBtn.innerHTML = `<i class="fas fa-globe"></i> ${region}`;
+            localStorage.setItem('selectedRegion', region);
+            regionDropdown.classList.remove('show');
+        }
+    });
+
+    // Выбор валюты
+    currencyDropdown.addEventListener('click', (e) => {
+        const target = e.target.closest('.dropdown-item');
+        if (target) {
+            const currency = target.getAttribute('data-currency');
+            state.currentCurrency = currency;
+            currencyBtn.textContent = currency;
+            localStorage.setItem('selectedCurrency', currency);
+            updateAllPrices();
+            currencyDropdown.classList.remove('show');
+        }
+    });
+
+    // Закрытие выпадающих списков при клике вне их
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.selector-dropdown.show').forEach(dd => dd.classList.remove('show'));
+    });
+
+    // Эффект "прилипания" хедера при прокрутке
+    // ИСПРАВЛЕНО: Один слушатель события scroll
+    window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Добавление в корзину
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            const productName = this.getAttribute('data-product-name');
+            const price = this.getAttribute('data-price');
             
-            // Close all dropdowns
-            document.querySelectorAll('.selector-dropdown').forEach(dd => {
-                dd.classList.remove('show');
+            state.cartItems.push({
+                name: productName,
+                price: parseFloat(price),
             });
             
-            // Open the requested dropdown if it wasn't already open
-            if (!isOpen) {
-                dropdown.classList.add('show');
-            }
-        }
+            localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+            updateCartUI();
+            showCartNotification(productName);
+        });
+    });
 
-        // Region selection
-        document.getElementById('regionDropdown').addEventListener('click', function(e) {
-            if (e.target.classList.contains('dropdown-item')) {
-                const region = e.target.getAttribute('data-region');
-                currentRegion = region;
-                document.getElementById('regionBtn').innerHTML = `<i class="fas fa-globe"></i> ${region}`;
-                this.classList.remove('show');
-                
-                // Save to localStorage (note: this is for demonstration - in real Shopify, use cookies)
-                localStorage.setItem('selectedRegion', region);
+    // Форма подписки
+    newsletterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const emailInput = this.querySelector('input[type="email"]');
+        alert(`Thank you! We've subscribed ${emailInput.value} to our newsletter.`);
+        this.reset();
+    });
+
+    // Плавный скролл по якорям
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
+    });
 
-        // Currency selection
-        document.getElementById('currencyDropdown').addEventListener('click', function(e) {
-            if (e.target.classList.contains('dropdown-item')) {
-                const currency = e.target.getAttribute('data-currency');
-                currentCurrency = currency;
-                document.getElementById('currencyBtn').textContent = currency;
-                this.classList.remove('show');
-                
-                // Update all prices on the page
-                updatePrices();
-                
-                // Save to localStorage
-                localStorage.setItem('selectedCurrency', currency);
-            }
+    // Lightbox (всплывающее изображение)
+    document.querySelectorAll('.product-image img').forEach(img => {
+        img.addEventListener('click', function() {
+            lightboxImg.src = this.src;
+            lightboxImg.alt = this.alt;
+            lightbox.classList.add('show');
         });
+    });
 
-        // Update prices based on currency
-        // Обновляет цены в зависимости от валюты
-function updatePrices() {
-    const priceElements = document.querySelectorAll('[data-price]');
-    priceElements.forEach(el => {
-        const originalPrice = parseFloat(el.getAttribute('data-price'));
-        const convertedPrice = (originalPrice * exchangeRates[currentCurrency]).toFixed(2);
-        
-        // Исправлено: символ по умолчанию '$'
-        let currencySymbol = '$'; 
-        switch(currentCurrency) {
-            case 'EUR': currencySymbol = '€'; break;
-            case 'GBP': currencySymbol = '£'; break;
-            // Исправлено: символ для CAD также '$'
-            case 'CAD': currencySymbol = '$'; break; 
+    function closeLightbox() {
+        lightbox.classList.remove('show');
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLightbox();
         }
-        
-        el.textContent = `${currencySymbol}${convertedPrice}`;
     });
     
-    // Обновляет также старые цены
-    document.querySelectorAll('.old-price').forEach(el => {
-        if (el.textContent.includes('$12.99')) {
-            const convertedPrice = (12.99 * exchangeRates[currentCurrency]).toFixed(2);
-            // Исправлено: символ по умолчанию '$'
-            let currencySymbol = '$'; 
-            switch(currentCurrency) {
-                case 'EUR': currencySymbol = '€'; break;
-                case 'GBP': currencySymbol = '£'; break;
-                // Исправлено: символ для CAD также '$'
-                case 'CAD': currencySymbol = '$'; break;
-            }
-            el.textContent = `${currencySymbol}${convertedPrice}`;
-        } else if (el.textContent.includes('$16.99')) {
-            const convertedPrice = (16.99 * exchangeRates[currentCurrency]).toFixed(2);
-            // Исправлено: символ по умолчанию '$'
-            let currencySymbol = '$'; 
-            switch(currentCurrency) {
-                case 'EUR': currencySymbol = '€'; break;
-                case 'GBP': currencySymbol = '£'; break;
-                // Исправлено: символ для CAD также '$'
-                case 'CAD': currencySymbol = '$'; break;
-            }
-            el.textContent = `${currencySymbol}${convertedPrice}`;
-        }
+    // --- Анимации ---
+    
+    // ИСПРАВЛЕНО: Для ховер-эффектов используются классы CSS
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('mouseenter', () => card.classList.add('hover-effect'));
+        card.addEventListener('mouseleave', () => card.classList.remove('hover-effect'));
     });
-}
-
-        // Add data-price attributes to current prices
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('[data-product="solo-fortress"] .current-price').setAttribute('data-price', '8.99');
-            document.querySelector('[data-product="clan-citadel"] .current-price').setAttribute('data-price', '12.99');
-            document.querySelector('[data-product="farm-bunker"] .current-price').setAttribute('data-price', '6.99');
-        });
-
-        // Add to Cart functionality
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', function() {
-                const productName = this.getAttribute('data-product-name');
-                const price = this.getAttribute('data-price');
-                
-                // Add to cart array
-                cartItems.push({
-                    name: productName,
-                    price: parseFloat(price),
-                    currency: currentCurrency
-                });
-                
-                // Update cart count
-                updateCartCount();
-                
-                // Show notification
-                showCartNotification(productName);
-                
-                // Store in localStorage for persistence
-                localStorage.setItem('cartItems', JSON.stringify(cartItems));
-            });
-        });
-
-        function updateCartCount() {
-            const cartCount = document.getElementById('cartCount');
-            cartCount.textContent = cartItems.length;
-            
-            if (cartItems.length > 0) {
-                cartCount.classList.add('show');
-            } else {
-                cartCount.classList.remove('show');
-            }
+    /*
+      В твоем CSS нужно добавить:
+      .product-card.hover-effect {
+          transform: translateY(-8px) scale(1.02);
+      }
+    */
+    
+    // ИСПРАВЛЕНО: Одна система анимации при прокрутке
+    function setupScrollAnimations() {
+        const elementsToAnimate = document.querySelectorAll('.animate-on-scroll');
+        
+        if (!('IntersectionObserver' in window)) {
+            // Если браузер не поддерживает IntersectionObserver, просто показываем элементы
+            elementsToAnimate.forEach(el => el.classList.add('is-visible'));
+            return;
         }
 
-        function showCartNotification(productName) {
-            const notification = document.getElementById('cartNotification');
-            const notificationText = document.getElementById('cartNotificationText');
-            
-            notificationText.textContent = `${productName} has been added to your cart.`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Newsletter form
-        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input[type="email"]').value;
-            
-            // Simulate newsletter subscription
-            alert(`Thank you! We've subscribed ${email} to our newsletter.`);
-            this.reset();
-        });
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Lightbox functionality
-        document.querySelectorAll('.product-image img').forEach(img => {
-            img.addEventListener('click', function() {
-                const lightbox = document.getElementById('lightbox');
-                const lightboxImg = document.getElementById('lightboxImg');
-                
-                lightboxImg.src = this.src;
-                lightboxImg.alt = this.alt;
-                lightbox.style.display = 'flex';
-            });
-        });
-
-        document.getElementById('lightboxClose').addEventListener('click', function() {
-            document.getElementById('lightbox').style.display = 'none';
-        });
-
-        document.getElementById('lightbox').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-            }
-        });
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.selector-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        });
-
-        // Header scroll effect
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('.site-header');
-            if (window.scrollY > 50) { // Порог прокрутки, можно изменить
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // Load saved preferences
-        window.addEventListener('load', function() {
-            const savedRegion = localStorage.getItem('selectedRegion');
-            const savedCurrency = localStorage.getItem('selectedCurrency');
-            const savedCartItems = localStorage.getItem('cartItems');
-            
-            if (savedRegion) {
-                currentRegion = savedRegion;
-                document.getElementById('regionBtn').innerHTML = `<i class="fas fa-globe"></i> ${savedRegion}`;
-            }
-            
-            if (savedCurrency) {
-                currentCurrency = savedCurrency;
-                document.getElementById('currencyBtn').textContent = savedCurrency;
-                updatePrices();
-            }
-            
-            if (savedCartItems) {
-                cartItems = JSON.parse(savedCartItems);
-                updateCartCount();
-            }
-        });
-
-        // Enhanced product card interactions
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px) scale(1.02)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Отключаем наблюдение после анимации
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        // Observe elements for scroll animations
-        document.querySelectorAll('.advantage-item, .product-card').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
-        });
+        elementsToAnimate.forEach(el => observer.observe(el));
+    }
+    /*
+      В HTML добавь класс .animate-on-scroll к нужным элементам.
+      В CSS добавь:
+      .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
+      .animate-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    */
 
-        // Keyboard accessibility
-        document.querySelectorAll('.product-button, .cta-button, .newsletter-button').forEach(button => {
-            button.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
-                }
-            });
-        });
-
-        // Add ARIA labels for accessibility
-        document.getElementById('cartIcon').setAttribute('aria-label', `Shopping cart with ${cartItems.length} items`);
-        
-        // Update ARIA label when cart changes
-        function updateCartAccessibility() {
-            document.getElementById('cartIcon').setAttribute('aria-label', `Shopping cart with ${cartItems.length} items`);
-        }
-
-        // Call updateCartAccessibility when cart changes
-        const originalUpdateCartCount = updateCartCount;
-        updateCartCount = function() {
-            originalUpdateCartCount();
-            updateCartAccessibility();
-        };
+    // --- Запуск приложения ---
+    initializeApp();
+});
